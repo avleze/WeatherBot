@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-project xmlns="http://www.mulesoft.com/tooling/project" runtimeId="org.mule.tooling.server.3.6.0.ee" schemaVersion="3.5.0.0">
+    <name>weatherbot</name>
+    <description>Descripción del proyecto</description>
+    <muleExtension name="Twitter" qualifier="org.mule.tooling.ui.contribution.twitter.3.6.0"/>
+    <muleExtension name="Facebook" qualifier="org.mule.tooling.ui.contribution.facebook.3.5.0"/>
+    <muleExtension name="Mongo DB" qualifier="org.mule.tooling.ui.contribution.mongo.3.5.0"/>
+    <muleExtension name="MongoHQ" qualifier="org.mule.tooling.ui.contribution.mongohq"/>
+    <muleExtension name="APIkit" qualifier="org.mule.tooling.apikit.3.6.0"/>
+    <muleExtension name="Mule Requester" qualifier="org.mule.tooling.ui.contribution.mulerequester.3.5.0"/>
+</mule-project>

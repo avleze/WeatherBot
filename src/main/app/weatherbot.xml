@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mulerequester="http://www.mulesoft.org/schema/mule/mulerequester" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:mongohq="http://www.mulesoft.org/schema/mule/mongohq" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:facebook="http://www.mulesoft.org/schema/mule/facebook"  xmlns:twitter="http://www.mulesoft.org/schema/mule/twitter" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/current/mule-ajax.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/twitter http://www.mulesoft.org/schema/mule/twitter/current/mule-twitter.xsd
+http://www.mulesoft.org/schema/mule/facebook http://www.mulesoft.org/schema/mule/facebook/current/mule-facebook.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
+http://www.mulesoft.org/schema/mule/mongohq http://www.mulesoft.org/schema/mule/mongohq/current/mule-mongohq.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/mulerequester http://www.mulesoft.org/schema/mule/mulerequester/current/mule-mulerequester.xsd">
+    <http:request-config name="HTTP_Request_Cadiz" protocol="HTTPS" host="opendata.aemet.es" port="443" basePath="/opendata/api/prediccion/especifica/municipio/diaria/11012/" doc:name="HTTP Request Configuration">
+    </http:request-config>
+    <http:request-config name="datosfinales" protocol="HTTPS" host="opendata.aemet.es" port="443" basePath="#[payload.substring(26)]" doc:name="HTTP Request Configuration"/>
+    <twitter:config name="Twitter" accessKey="853656464103284738-CTQVOmJHCZyUSeV7haXrSV26iZ3NAhl" accessSecret="0OzKkZhs6W8ngeQjSJqABwDRcgWq46RP8NrxB2IcjGIUy" consumerKey="jauaIhVoOvtm2e8k2v0W52PqN" consumerSecret="nlq53XgzInMvwIkgkTJXpaNtlbOh49wMRFYITMkDqvE8MuMtmY" doc:name="Twitter"/>
+    <twitter:config name="Twitter__Configuration" accessKey="853656464103284738-CTQVOmJHCZyUSeV7haXrSV26iZ3NAhl" accessSecret="0OzKkZhs6W8ngeQjSJqABwDRcgWq46RP8NrxB2IcjGIUy" consumerKey="jauaIhVoOvtm2e8k2v0W52PqN" consumerSecret="nlq53XgzInMvwIkgkTJXpaNtlbOh49wMRFYITMkDqvE8MuMtmY" doc:name="Twitter: Configuration"/>
+    <mongo:config name="Mongo_DB" database="test" host="127.0.0.1" doc:name="Mongo DB" password="12345" username="antonio"/>
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="5060" basePath="/insertar" doc:name="HTTP Listener Configuration"/>
+    <file:connector name="input" workDirectory="/home/osboxes/AnypointStudio/workspace/weatherbot" workFileNamePattern="municipios.json" autoDelete="true" streaming="true" validateConnections="true" doc:name="File"/>
+    <data-mapper:config name="MS_Excel_To_JSON" transformationGraphPath="ms_excel_to_json.grf" doc:name="MS_Excel_To_JSON"/>
+    <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" doc:name="HTTP Request Configuration" basePath="/opendata/api/prediccion/especifica/municipio/diaria/#[payload]/" host="opendata.aemet.es" port="443"/>
+    
+    <flow name="publishWeather" initialState="started">
+        <poll doc:name="Poll">
+            <fixed-frequency-scheduler frequency="1" timeUnit="DAYS"/>
+            <http:request config-ref="HTTP_Request_Cadiz" path="/" method="GET" followRedirects="true" doc:name="HTTP" requestStreamingMode="NEVER">
+                <http:request-builder>
+                    <http:query-param paramName="api_key" value="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbnRvbmlvLnZlbGV6ZXN0ZXZlekBhbHVtLnVjYS5lcyIsImp0aSI6ImY2NDEzNWJmLWU1MjAtNDlhOC04ODZlLTM4MmQ1NmRjYTM5MCIsImV4cCI6MTQ5OTY3OTQ5NCwiaXNzIjoiQUVNRVQiLCJpYXQiOjE0OTE5MDM0OTQsInVzZXJJZCI6ImY2NDEzNWJmLWU1MjAtNDlhOC04ODZlLTM4MmQ1NmRjYTM5MCIsInJvbGUiOiIifQ.IFUmZD-mc-pjRlKMH-hBzew2mpRJIgcIon3q_6fIzg4"/>
+                </http:request-builder>
+            </http:request>
+        </poll>
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <json:json-to-object-transformer doc:name="JSON to Object"/>
+        <component class="ObtenerURLCorrecta" doc:name="Obtenemos la URL Correcta"/>
+        <http:request config-ref="datosfinales" path="/" method="GET" doc:name="HTTP"/>
+        <json:json-to-object-transformer returnClass="aemet.Prediccion[]" doc:name="JSON a Objeto Predicci&#243;n"/>
+        <scripting:component doc:name="Emitir mensaje seg&#250;n estado del cielo">
+            <scripting:script engine="Groovy"><![CDATA[ArrayList<String> mensajes = new ArrayList<>();
+
+aemet.EstadoCielo cieloManana = payload[0].getPrediccion().getDia().get(1).getEstadoCielo().get(0);
+
+String eCielo = cieloManana.getDescripcion();
+String hora = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new java.util.Date())+ " ";
+
+if(eCielo.contains("Nubes"))
+{
+	mensajes.add(hora + "Mañana a la playa no, pero una cervecita en una terraza pega.");
+}
+
+if(eCielo.contains("nuboso") || eCielo.contains("Nuboso") || eCielo.contains("nubosos"))
+{
+	if(eCielo.contains("nieve"))
+		mensajes.add(hora + "Nieva en Cái, sal a la calle y haz un bonito muñeco de nieve");
+	else if(eCielo.contains("lluvia"))
+		mensajes.add(hora + "Mañana mejor ve con paragüas, aunque no te va a servir de ná");
+	else if(eCielo.contains("tormenta"))
+		mensajes.add(hora + "Mañana	la luz más barata, ¡tormenta!"); 
+	else
+		mensajes.add(hora + "Mañana los vampiros pueden salir, ¡nublaito!");
+}
+
+if(eCielo.contains("Despejado"))
+	mensajes.add(hora + "La asociación de bingo de Cadi, recomienda el juego en la playa mañana todo el día ¡Despejao!");
+
+if(eCielo.contains("Cubierto"))
+{
+	if(eCielo.contains("nieve"))
+		mensajes.add(hora + "¡Mañana a Grazalema a la nieve! ¡Nieva en Cái!");
+	else if(eCielo.contains("lluvia"))
+		mensajes.add(hora + "Mañana mejor ve con paragüas, aunque no te va a servir de ná");
+	else if(eCielo.contains("tormenta"))
+		mensajes.add(hora + "Mañana	la luz más barata, ¡tormenta!"); 
+	else
+		mensajes.add(hora + "Mañana los vampiros pueden salir, ¡cubierto!");
+}
+
+return mensajes;]]></scripting:script>
+        </scripting:component>
+        <twitter:update-status config-ref="Twitter__Configuration" status="#[payload.get(0)]" doc:name="Twitter"/>
+    </flow>
+    <flow name="replyIfMentioned" >
+        <poll doc:name="Poll">
+            <fixed-frequency-scheduler frequency="24" timeUnit="SECONDS"/>
+            <twitter:get-mentions-timeline config-ref="Twitter__Configuration" count="1" doc:name="Twitter"/>
+        </poll>
+        <byte-array-to-object-transformer returnClass="twitter4j.ResponseList" doc:name="Byte Array to Object"/>
+        <echo-component doc:name="Echo"/>
+        <idempotent-message-filter idExpression="#[payload.get(0).getId()]" valueExpression="#[payload.get(0).getId()]" doc:name="Idempotent Message">
+            <simple-text-file-store name="guardate" maxEntries="-1" directory="./objectstore"/>
+        </idempotent-message-filter>
+        <set-session-variable variableName="textoTwit" value="#[payload.get(0).getText()]" doc:name="Guardar texto twit"/>
+        <set-variable variableName="payloadTwitter" value="#[payload]" doc:name="payloadTwitter"/>
+        <scripting:component doc:name="Script">
+            <scripting:script engine="Groovy"><![CDATA[return new java.io.File("./municipios/municipios.json");
+]]></scripting:script>
+        </scripting:component>
+        <file:file-to-string-transformer doc:name="File to String"/>
+        <json:json-to-object-transformer returnClass="aemet.Municipio[]" doc:name="JSON to Object"/>
+        <scripting:component doc:name="Script">
+            <scripting:script engine="Groovy"><![CDATA[
+for(aemet.Municipio i : payload)
+{
+	if(sessionVars.textoTwit.contains(i.getnombre()))
+		return (i.getcpro() + i.getcmun());
+}]]></scripting:script>
+        </scripting:component>
+        <http:request config-ref="HTTP_Request_Configuration" path="/" method="GET" requestStreamingMode="NEVER" followRedirects="true" doc:name="Peticion a Aemet">
+            <http:request-builder>
+                <http:query-param paramName="api_key" value="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbnRvbmlvLnZlbGV6ZXN0ZXZlekBhbHVtLnVjYS5lcyIsImp0aSI6ImY2NDEzNWJmLWU1MjAtNDlhOC04ODZlLTM4MmQ1NmRjYTM5MCIsImV4cCI6MTQ5OTY3OTQ5NCwiaXNzIjoiQUVNRVQiLCJpYXQiOjE0OTE5MDM0OTQsInVzZXJJZCI6ImY2NDEzNWJmLWU1MjAtNDlhOC04ODZlLTM4MmQ1NmRjYTM5MCIsInJvbGUiOiIifQ.IFUmZD-mc-pjRlKMH-hBzew2mpRJIgcIon3q_6fIzg4"/>
+            </http:request-builder>
+        </http:request>
+        <byte-array-to-string-transformer doc:name="Byte_Array to String"/>
+        <json:json-to-object-transformer doc:name="JSON to Object"/>
+        <component class="ObtenerURLCorrecta" doc:name="Obtenemos la URL Correcta"/>
+        <http:request config-ref="datosfinales" path="/" method="GET" doc:name="HTTP"/>
+        <json:json-to-object-transformer returnClass="aemet.Prediccion[]" doc:name="JSON a Objeto Predicci&#243;n"/>
+        <scripting:component doc:name="Estado del cielo">
+            <scripting:script engine="Groovy"><![CDATA[ArrayList<String> mensajes = new ArrayList<>();
+
+aemet.EstadoCielo cieloManana = payload[0].getPrediccion().getDia().get(1).getEstadoCielo().get(0);
+
+String eCielo = cieloManana.getDescripcion();
+
+return eCielo;]]></scripting:script>
+        </scripting:component>
+        <twitter:update-status config-ref="Twitter__Configuration" status=" @#[flowVars.payloadTwitter.get(0).getUser().getScreenName()]  El tiempo para ese municipio ser&#225;: #[payload]" inReplyTo="#[flowVars.payloadTwitter.get(0).getId()]" doc:name="Twitter"/>
+    </flow>
+</mule>

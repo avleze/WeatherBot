@@ -1,0 +1,15 @@
+<metadata__cache__entry>
+  <version>5.2.0.0</version>
+  <connectorName>MS_Excel_To_JSON</connectorName>
+  <metadataIo class="tree-map">
+    <entry>
+      <string>http://www.mulesoft.org/schema/mule/ee/data-mapper/transform</string>
+      <map>
+        <entry>
+          <string>__default__</string>
+          <org.mule.tooling.metadata.cache.DefaultMetadataCacheEntry/>
+        </entry>
+      </map>
+    </entry>
+  </metadataIo>
+</metadata__cache__entry>

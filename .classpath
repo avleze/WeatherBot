@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry exported="true" kind="con" path="MULE_RUNTIME"/>
+	<classpathentry kind="src" path="src/main/app"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
+	<classpathentry kind="src" path="src/main/api"/>
+	<classpathentry kind="src" path="mappings"/>
+	<classpathentry kind="con" path="MULE_LIB/Twitter/org.mule.tooling.ui.contribution.twitter.3.6.0"/>
+	<classpathentry kind="con" path="MULE_LIB/Facebook/org.mule.tooling.ui.contribution.facebook.3.5.0"/>
+	<classpathentry kind="con" path="MULE_LIB/Mongo DB/org.mule.tooling.ui.contribution.mongo.3.5.0"/>
+	<classpathentry kind="con" path="MULE_LIB/MongoHQ/org.mule.tooling.ui.contribution.mongohq"/>
+	<classpathentry kind="con" path="MULE_LIB/APIkit/org.mule.tooling.apikit.3.6.0"/>
+	<classpathentry kind="con" path="MULE_LIB/Mule Requester/org.mule.tooling.ui.contribution.mulerequester.3.5.0"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

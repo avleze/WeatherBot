@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="osboxes" created="Wed Apr 19 02:27:01 CEST 2017" description="MS Excel To JSON" guiVersion="3.4.4.P" id="1492567223068" licenseCode="Unlicensed" licenseType="Unknown" modified="Wed Apr 19 02:27:01 CEST 2017" modifiedBy="osboxes" name="MS_Excel_To_JSON" preview-file="${Project_Home}/17codmun.xls" revision="1.0" showComponentDetails="false">
+<Global>
+<Metadata __referenceCounter="1" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _type="Input" id="2b4801af-96d7-454b-9ad5-7247f0a0ee2f">
+<Record fieldDelimiter="," name="_17codmun" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __sourcePath="1/0" label="cpro" name="cpro" type="string"/>
+<Field __sourcePath="1/1" label="cmun" name="cmun" type="string"/>
+<Field __sourcePath="1/2" label="nombre" name="nombre" type="string"/>
+<Field __artificialType="_id" auto_filling="global_row_count" name="__id" type="long"/>
+</Record>
+</Metadata>
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/_x005f17codmun" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _type="Output" id="bd1be0f8-8ed8-4caa-acf6-1e2423640142">
+<Record fieldDelimiter="," name="_17codmun" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __index="1" __sourcePath="{}/_x005f17codmun/cmun" containerType="SINGLE" label="cmun" name="cmun" type="string"/>
+<Field __index="0" __sourcePath="{}/_x005f17codmun/cpro" containerType="SINGLE" label="cpro" name="cpro" type="string"/>
+<Field __index="2" __sourcePath="{}/_x005f17codmun/nombre" containerType="SINGLE" label="nombre" name="nombre" type="string"/>
+</Record>
+</Metadata>
+<Dictionary>
+<Entry id="DictionaryEntry0" input="true" name="inputPayload" output="false" type="object"/>
+<Entry id="DictionaryEntry1" input="false" name="outputPayload" output="true" type="object"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" guiName="Foreach '_17codmun' -&gt; '_x005f17codmun'" guiX="460" guiY="20" id="FOREACH__17CODMUN__X005F17CODMUN" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
+<attr name="melScript"><![CDATA[//MEL
+//START -> DO NOT REMOVE
+output.__id = num2str(input.__id);
+//END -> DO NOT REMOVE
+output.cpro = input.cpro;
+output.cmun = input.cmun;
+output.nombre = input.nombre;
+]]></attr>
+</Node>
+<Node cacheInMemory="true" charset="UTF-8" enabled="enabled" fileURL="dict:outputPayload" guiName="JSON WRITER" guiX="900" guiY="20" id="JSON_WRITER0" type="JSON_WRITER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<clover:collection clover:name="_17codmun" xmlns:clover="http://www.cloveretl.com/ns/xmlmapping">
+  <item clover:inPort="0">
+    <cpro>$0.cpro</cpro>
+    <cmun>$0.cmun</cmun>
+    <nombre>$0.nombre</nombre>
+  </item>
+</clover:collection>]]></attr>
+<attr name="_data_format"><![CDATA[JSON]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="dict:inputPayload" guiName="MS Excel READER" guiX="20" guiY="20" id="SPREADSHEET_READER0" type="SPREADSHEET_READER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mapping>
+    <globalAttributes>
+        <orientation>VERTICAL</orientation>
+        <step>1</step>
+        <writeHeader>true</writeHeader>
+    </globalAttributes>
+    <defaultSkip>1</defaultSkip>
+    <headerGroups>
+        <headerGroup skip="1">
+            <cloverField>cpro</cloverField>
+            <headerRanges>
+                <headerRange begin="A1"/>
+            </headerRanges>
+        </headerGroup>
+        <headerGroup skip="1">
+            <cloverField>cmun</cloverField>
+            <headerRanges>
+                <headerRange begin="B1"/>
+            </headerRanges>
+        </headerGroup>
+        <headerGroup skip="1">
+            <cloverField>nombre</cloverField>
+            <headerRanges>
+                <headerRange begin="C1"/>
+            </headerRanges>
+        </headerGroup>
+    </headerGroups>
+</mapping>
+]]></attr>
+<attr name="_data_format"><![CDATA[XLS]]></attr>
+<attr name="__dataSourceDefinition"><![CDATA[${Project_Home}/17codmun.xls]]></attr>
+</Node>
+<Edge debugMode="true" fromNode="FOREACH__17CODMUN__X005F17CODMUN:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="bd1be0f8-8ed8-4caa-acf6-1e2423640142" outPort="Port 0 (out)" toNode="JSON_WRITER0:0"/>
+<Edge debugMode="true" fromNode="SPREADSHEET_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="2b4801af-96d7-454b-9ad5-7247f0a0ee2f" outPort="Port 0 (output)" toNode="FOREACH__17CODMUN__X005F17CODMUN:0"/>
+</Phase>
+</Graph>
